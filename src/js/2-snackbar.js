@@ -4,38 +4,38 @@ import 'izitoast/dist/css/iziToast.min.css';
 document.querySelector('.form').addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const delayInput = document.querySelector('input[name="delay"]');
-  const stateInput = document.querySelector('input[name="state"]:checked');
+  const delayInput = this.querySelector('[name="delay"]');
+  const stateRadio = this.querySelector('[name="state"]:checked');
 
-  if (!delayInput || !stateInput) {
-    console.error('Invalid form inputs');
+  const delay = parseInt(delayInput.value, 10);
+
+  if (isNaN(delay) || delay <= 0) {
+    iziToast.error({
+      title: 'Error',
+      message: 'Please enter a valid positive delay value',
+    });
     return;
   }
 
-  const delay = parseInt(delayInput.value, 10);
-  const state = stateInput.value;
-
-  const snackbarPromise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (state === 'fulfilled') {
-        resolve(delay);
-      } else {
-        reject(delay);
-      }
-    }, delay);
+  const promise = new Promise((resolve, reject) => {
+    if (stateRadio.value === 'fulfilled') {
+      setTimeout(() => resolve(delay), delay);
+    } else {
+      setTimeout(() => reject(delay), delay);
+    }
   });
 
-  snackbarPromise.then(
-    delay => {
+  promise.then(
+    result => {
       iziToast.success({
-        title: 'Fulfilled promise',
-        message: `✅ Fulfilled promise in ${delay}ms`,
+        title: 'Fulfilled',
+        message: `✅ Fulfilled promise in ${result}ms`,
       });
     },
-    delay => {
+    error => {
       iziToast.error({
-        title: 'Rejected promise',
-        message: `❌ Rejected promise in ${delay}ms`,
+        title: 'Rejected',
+        message: `❌ Rejected promise in ${error}ms`,
       });
     }
   );
