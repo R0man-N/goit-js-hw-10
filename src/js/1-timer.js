@@ -3,7 +3,6 @@ import 'flatpickr/dist/flatpickr.min.css';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-const dateInput = document.querySelector('#datetime-picker');
 const startButton = document.querySelector('[data-start]');
 
 const display = {
@@ -17,28 +16,6 @@ let periodId;
 let userSelectedDate;
 
 startButton.disabled = true;
-
-dateInput.addEventListener('change', () => {
-  const selectedDate = new Date(dateInput.value);
-  const currentDate = new Date();
-  if (!selectedDate) return;
-
-  if (selectedDate < currentDate) {
-    startButton.disabled = true;
-  } else {
-    startButton.disabled = false;
-  }
-
-  userSelectedDate = selectedDate;
-
-  clearInterval(periodId);
-  displayFormattedTime({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-});
 
 startButton.addEventListener('click', () => {
   startButton.disabled = true;
@@ -86,13 +63,27 @@ const options = {
   maxDate: new Date().fp_incr(30),
 
   onClose(selectedDates) {
-    userSelectedDate = selectedDates[0];
-    if (!userSelectedDate || userSelectedDate < Date.now()) {
+    const selectedDate = new Date(selectedDates[0]);
+    const currentDate = new Date();
+
+    if (!selectedDate || selectedDate < currentDate) {
       iziToast.error({
         message: 'Please choose a date in the future',
         position: 'topRight',
       });
+      return;
     }
+
+    userSelectedDate = selectedDate;
+    startButton.disabled = false;
+
+    clearInterval(periodId);
+    displayFormattedTime({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    });
   },
 };
 

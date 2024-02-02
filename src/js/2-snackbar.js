@@ -1,11 +1,15 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-document.querySelector('.form').addEventListener('submit', function (event) {
+const form = document.querySelector('.form');
+
+form.addEventListener('submit', handleSubmit);
+
+function handleSubmit(event) {
   event.preventDefault();
 
-  const delayInput = this.querySelector('[name="delay"]');
-  const stateRadio = this.querySelector('[name="state"]:checked');
+  const delayInput = event.target.elements['delay'];
+  const stateRadio = event.target.elements['state'].value;
 
   const delay = parseInt(delayInput.value, 10);
 
@@ -18,11 +22,13 @@ document.querySelector('.form').addEventListener('submit', function (event) {
   }
 
   const promise = new Promise((resolve, reject) => {
-    if (stateRadio.value === 'fulfilled') {
-      setTimeout(() => resolve(delay), delay);
-    } else {
-      setTimeout(() => reject(delay), delay);
-    }
+    setTimeout(() => {
+      if (stateRadio === 'fulfilled') {
+        resolve(delay);
+      } else {
+        reject(delay);
+      }
+    }, delay);
   });
 
   promise.then(
@@ -39,4 +45,4 @@ document.querySelector('.form').addEventListener('submit', function (event) {
       });
     }
   );
-});
+}
